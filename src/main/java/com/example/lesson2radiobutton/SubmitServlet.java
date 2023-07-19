@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @WebServlet(name = "submitServlet", value = "/SubmitServlet")
 public class SubmitServlet extends HttpServlet {
@@ -18,22 +19,22 @@ public class SubmitServlet extends HttpServlet {
             throws ServletException, IOException {
         HttpSession session = request.getSession();
 
-        Integer option1Count = (Integer) session.getAttribute("option1Count");
-        Integer option2Count = (Integer) session.getAttribute("option2Count");
-        Integer option3Count = (Integer) session.getAttribute("option3Count");
-        Integer option4Count = (Integer) session.getAttribute("option4Count");
+        AtomicInteger option1Count = (AtomicInteger) session.getAttribute("option1Count");
+        AtomicInteger option2Count = (AtomicInteger) session.getAttribute("option2Count");
+        AtomicInteger option3Count = (AtomicInteger) session.getAttribute("option3Count");
+        AtomicInteger option4Count = (AtomicInteger) session.getAttribute("option4Count");
 
         if (option1Count == null) {
-            option1Count = 0;
+            option1Count = new AtomicInteger(0);
         }
         if (option2Count == null) {
-            option2Count = 0;
+            option2Count = new AtomicInteger(0);
         }
         if (option3Count == null) {
-            option3Count = 0;
+            option3Count = new AtomicInteger(0);
         }
         if (option4Count == null) {
-            option4Count = 0;
+            option4Count = new AtomicInteger(0);
         }
 
         String technology = request.getParameter("technology");
@@ -41,17 +42,17 @@ public class SubmitServlet extends HttpServlet {
 
         if (technology != null && !technology.isEmpty()) {
             if (technology.equals("option1")) {
-                option1Count++;
+                option1Count.incrementAndGet();
             } else if (technology.equals("option2")) {
-                option2Count++;
+                option2Count.incrementAndGet();
             }
         }
 
         if (salary != null && !salary.isEmpty()) {
             if (salary.equals("option3")) {
-                option3Count++;
+                option3Count.incrementAndGet();
             } else if (salary.equals("option4")) {
-                option4Count++;
+                option4Count.incrementAndGet();
             }
         }
 
@@ -60,10 +61,10 @@ public class SubmitServlet extends HttpServlet {
         session.setAttribute("option3Count", option3Count);
         session.setAttribute("option4Count", option4Count);
 
-        request.setAttribute("option1Count", option1Count);
-        request.setAttribute("option2Count", option2Count);
-        request.setAttribute("option3Count", option3Count);
-        request.setAttribute("option4Count", option4Count);
+        request.setAttribute("option1Count", option1Count.get());
+        request.setAttribute("option2Count", option2Count.get());
+        request.setAttribute("option3Count", option3Count.get());
+        request.setAttribute("option4Count", option4Count.get());
 
         request.getRequestDispatcher("/result.jsp").forward(request, response);
     }
